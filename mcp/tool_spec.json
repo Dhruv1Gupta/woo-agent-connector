@@ -1,0 +1,249 @@
+{
+  "name": "woocommerce-readonly",
+  "version": "1.0.0",
+  "transport": "stdio",
+  "command": "python -m woo_connector serve",
+  "tools": [
+    {
+      "name": "list_orders",
+      "description": "List WooCommerce orders (newest first by default), optionally filtered by status or date range. Read-only.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "on-hold",
+              "completed",
+              "cancelled",
+              "refunded",
+              "failed"
+            ]
+          },
+          "created_after": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601, e.g. 2026-09-01T00:00:00"
+          },
+          "created_before": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "orderby": {
+            "type": "string",
+            "enum": [
+              "date",
+              "id"
+            ],
+            "default": "date"
+          },
+          "order": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "default": "desc"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 1,
+            "description": "1-based page number"
+          },
+          "per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20,
+            "description": "Items per page (max 100)"
+          }
+        }
+      }
+    },
+    {
+      "name": "get_order",
+      "description": "Get one order by numeric ID: status, totals, line items, masked customer details.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "order_id"
+        ],
+        "properties": {
+          "order_id": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    {
+      "name": "search_orders",
+      "description": "Free-text search over orders (order number, customer name/email, product name). Use when you do not have the order ID.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "query"
+        ],
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "on-hold",
+              "completed",
+              "cancelled",
+              "refunded",
+              "failed"
+            ]
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 1,
+            "description": "1-based page number"
+          },
+          "per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20,
+            "description": "Items per page (max 100)"
+          }
+        }
+      }
+    },
+    {
+      "name": "list_products",
+      "description": "List catalogue products with price and stock fields. Filter by status, stock status or category ID.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "publish",
+              "draft",
+              "private",
+              "pending"
+            ],
+            "default": "publish"
+          },
+          "stock_status": {
+            "type": "string",
+            "enum": [
+              "instock",
+              "outofstock",
+              "onbackorder"
+            ]
+          },
+          "category_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 1,
+            "description": "1-based page number"
+          },
+          "per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20,
+            "description": "Items per page (max 100)"
+          }
+        }
+      }
+    },
+    {
+      "name": "get_product",
+      "description": "Get one product by ID including live stock quantity and stock status.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "product_id"
+        ],
+        "properties": {
+          "product_id": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    {
+      "name": "search_products",
+      "description": "Search products by text and/or exact SKU. Provide at least one of query or sku.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "sku": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 1,
+            "description": "1-based page number"
+          },
+          "per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20,
+            "description": "Items per page (max 100)"
+          }
+        }
+      }
+    },
+    {
+      "name": "list_low_stock_products",
+      "description": "Find published products whose managed stock is at or below a threshold, lowest first. Scans up to 500 products.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "threshold": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000,
+            "default": 5
+          }
+        }
+      }
+    },
+    {
+      "name": "connector_health",
+      "description": "Check that the store is reachable and the API key works. Reports latency and retry counts.",
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      }
+    }
+  ]
+}
